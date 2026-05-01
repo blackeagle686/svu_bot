@@ -263,8 +263,26 @@ main#chat-window {
     animation: bounce 1s infinite;
 }
 
-@keyframes bounce {
-    0%, 100% { transform: translateY(0); }
-    50% { transform: translateY(-5px); }
+.message-content pre {
+    background: rgba(0, 0, 0, 0.3);
+    padding: 15px;
+    border-radius: 12px;
+    overflow-x: auto;
+    margin: 10px 0;
+    border: 1px solid var(--glass-border);
+}
+
+.message-content code {
+    font-family: 'Fira Code', monospace;
+    font-size: 0.9rem;
+}
+
+.message-content ul, .message-content ol {
+    margin-left: 20px;
+    margin-bottom: 10px;
+}
+
+.message-content p {
+    margin-bottom: 8px;
 }
 

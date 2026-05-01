@@ -6,6 +6,7 @@
     <title>SVU Bot - South Valley University Assistant</title>
     <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body data-theme="dark">
     <div class="app-container">
@@ -115,7 +116,12 @@
         function addMessage(content, role) {
             const div = document.createElement('div');
             div.className = `message ${role}-message`;
-            div.innerHTML = `<div class="message-content">${content}</div>`;
+            
+            const contentDiv = document.createElement('div');
+            contentDiv.className = 'message-content';
+            contentDiv.innerHTML = role === 'bot' ? marked.parse(content) : content;
+            
+            div.appendChild(contentDiv);
             chatWindow.appendChild(div);
             chatWindow.scrollTop = chatWindow.scrollHeight;
         }
