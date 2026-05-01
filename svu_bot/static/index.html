@@ -131,7 +131,8 @@
             else if (selectedFile) addMessage(`Uploaded file: ${selectedFile.name}`, 'user');
 
             const formData = new FormData();
-            formData.append('message', msg || `Analyzing file: ${selectedFile ? selectedFile.name : ''}`);
+            formData.append('message', msg || (selectedFile ? `Analyzing file: ${selectedFile.name}` : 'Hello'));
+            formData.append('session_id', 'web_session');
             if (selectedFile) {
                 formData.append('file', selectedFile);
             }
