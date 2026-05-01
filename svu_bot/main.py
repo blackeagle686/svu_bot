@@ -7,6 +7,9 @@ from typing import Optional
 import os
 import shutil
 
+# File text extraction helper (best-effort)
+from svu_bot.utils.file_extractor import extract_text
+
 # Global bot instance
 bot = SVUBot()
 
@@ -44,12 +47,23 @@ async def chat_endpoint(
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
 
+        # Best-effort: extract a truncated text excerpt so the bot can analyze immediately
+        try:
+            excerpt = extract_text(file_path, max_chars=4000)
+        except Exception:
+            excerpt = ""
+
         if not message or message.strip() == "":
             # No custom prompt – use generic analysis request
             message = f"I've uploaded '{file.filename}'. Please analyze it and provide a comprehensive summary."
         else:
             # User chose a smart prompt chip (e.g. "Summarize this file") – keep intent, add file context
             message = f"{message} The file I'm referring to is: '{file.filename}' (just uploaded)."
+
+        # If we extracted an excerpt, include it in the prompt so the LLM can respond immediately.
+        if excerpt:
+            # Keep the message concise but useful; mark excerpt as truncated when applicable.
+            message += f"\n\nFile excerpt:\n{excerpt}"
 
     # Fallback for message if somehow still None
     if not message:
