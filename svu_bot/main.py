@@ -3,6 +3,7 @@ from fastapi.staticfiles import StaticFiles
 from fastapi.responses import FileResponse
 from svu_bot.bot import SVUBot
 from contextlib import asynccontextmanager
+from typing import Optional
 import os
 import shutil
 
@@ -29,26 +30,32 @@ async def read_index():
 
 @app.post("/chat")
 async def chat_endpoint(
-    message: str = Form(...),
-    session_id: str = Form("web_session"),
-    file: UploadFile = File(None)
+    message: Optional[str] = Form(None),
+    session_id: Optional[str] = Form("web_session"),
+    file: Optional[UploadFile] = File(None)
 ):
     """API endpoint to chat with SVU Bot, supporting file attachments."""
     
+    if not message and not file:
+        return {"reply": "Please provide a message or a file."}
+
     if file:
         file_path = os.path.join(DATA_DIR, file.filename)
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
         
-        # If a file was uploaded, we might want to slightly modify the prompt
-        # to ensure the bot looks at the new data.
         if not message or message.strip() == "":
             message = f"I've uploaded {file.filename}. Please analyze it."
         else:
             message = f"{message} (Context: I've also uploaded {file.filename})"
 
-    response = await bot.chat(message, session_id=session_id)
+    # Fallback for message if somehow still None
+    if not message:
+        message = "Hello"
+
+    response = await bot.chat(message, session_id=session_id or "web_session")
     return {"reply": response}
+
 
 
 if __name__ == "__main__":
