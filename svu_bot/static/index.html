@@ -214,8 +214,9 @@ filePromptChips.forEach(chip => {
 
 // ── Suggestion chips ─────────────────────────────────────────
 function useSuggestion(text) {
+    // Populate the input with the suggestion and focus — don't auto-send.
     userInput.value = text;
-    chatForm.dispatchEvent(new Event('submit'));
+    userInput.focus();
 }
 
 // ── Reply-to ─────────────────────────────────────────────────
