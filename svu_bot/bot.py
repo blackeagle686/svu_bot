@@ -21,7 +21,7 @@ class SVUBot:
     Integrates the high-level Phoenix framework with a modular NLP pipeline.
     """
     def __init__(self):
-        # Configure the bot instance
+        # Configure the bot instance with ultra-fast RAG optimization
         self.bot_instance = (
             ChatBot(local=False)
             .with_openai(
@@ -29,7 +29,14 @@ class SVUBot:
                 base_url="https://api.longcat.chat/openai"
             )
             .with_model(llm="LongCat-Flash-Lite")
-            .with_rag(data_to_insight_path=DATA_PATH)
+            .with_rag(
+                data_to_insight_path=DATA_PATH,
+                fast_rag=True,         # Skips extra LLM calls (HyDE, Query Expansion) for max speed
+                cag=True,              # Prioritizes Semantic Cache for instant responses
+                threshold=0.85,        # Sensitivity for cache hits
+                reranking=False,       # Skip CPU-intensive context reranking
+                hybrid_search=False    # Keep to dense vector search
+            )
             .with_memory()
             .with_system_prompt(
                 "You are the official South Valley University (SVU) Virtual Assistant. "
