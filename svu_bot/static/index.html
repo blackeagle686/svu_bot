@@ -3,179 +3,443 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SVU Bot - South Valley University Assistant</title>
-    <link href="https://fonts.googleapis.com/css2?family=Outfit:wght@300;400;600&display=swap" rel="stylesheet">
+    <meta name="description" content="South Valley University AI-powered virtual assistant — ask questions, upload documents, and get instant answers.">
+    <title>SVU Bot – South Valley University Assistant</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/style.css">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 </head>
 <body data-theme="dark">
-    <div class="app-container">
-        <header>
-            <div class="logo-container">
-                <span style="font-size: 2rem;">🎓</span>
-                <h1>South Valley University SVU</h1>
-            </div>
-            <button id="theme-toggle" class="theme-toggle">
-                <span id="theme-icon">☀️</span>
-                <span id="theme-text">Light Mode</span>
-            </button>
-        </header>
 
-        <main id="chat-window">
-            <div class="message bot-message">
-                <div class="message-content">
-                    Welcome to the <b>South Valley University</b> Virtual Assistant! 🏛️
-                    <br><br>
-                    I can help you with course information, campus details, or analyze your study materials.
-                    <br><br>
-                    How can I assist you today?
-                </div>
-            </div>
-        </main>
+<div class="app-container">
 
-        <div class="input-area">
-            <div class="input-wrapper">
-                <div class="suggestions-container">
-                    <div class="suggestion-chip" onclick="useSuggestion('Tell me about BAIT program')">🎓 BAIT Program</div>
-                    <div class="suggestion-chip" onclick="useSuggestion('How to register for courses?')">📝 Registration</div>
-                    <div class="suggestion-chip" onclick="useSuggestion('Show me a Flutter code example')">💻 Flutter Help</div>
-                    <div class="suggestion-chip" onclick="useSuggestion('Summarize the provided documents')">📚 Summary</div>
-                </div>
-                <div id="attachment-preview" class="attachment-preview">
-                    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"></path><polyline points="13 2 13 9 20 9"></polyline></svg>
-                    <span id="file-name"></span>
-                    <button id="remove-file" style="background:none; border:none; color: #ef4444; cursor:pointer; font-weight: bold;">&times;</button>
-                </div>
-                <form id="chat-form">
-                    <div class="input-container">
-                        <input type="file" id="file-input" style="display: none;">
-                        <button type="button" id="attach-btn" class="attach-btn">
-                            <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"></path></svg>
-                        </button>
-                        <input type="text" id="user-input" placeholder="Ask anything about SVU..." autocomplete="off">
-                    </div>
-                    <button type="submit" id="send-btn">
-                        <svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="22" y1="2" x2="11" y2="13"></line><polygon points="22 2 15 22 11 13 2 9 22 2"></polygon></svg>
-                    </button>
-                </form>
+    <!-- ── Header ─────────────────────────────────────────────── -->
+    <header>
+        <div class="logo-container">
+            <div class="logo-icon">🎓</div>
+            <div class="logo-text">
+                <h1>South Valley University</h1>
+                <span class="subtitle">AI Virtual Assistant · SVU Bot</span>
             </div>
         </div>
+        <div class="header-actions">
+            <div class="status-badge">
+                <div class="status-dot"></div>
+                Online
+            </div>
+            <button id="theme-toggle" class="theme-toggle" aria-label="Toggle theme">
+                <span id="theme-icon">☀️</span>
+                <span id="theme-text">Light</span>
+            </button>
+        </div>
+    </header>
 
-        <footer>
-            Built with ❤️ using Phoenix AI Framework
-        </footer>
+    <!-- ── Chat Window ─────────────────────────────────────────── -->
+    <main id="chat-window" role="log" aria-live="polite" aria-label="Chat messages">
+        <!-- Welcome message rendered by JS -->
+    </main>
+
+    <!-- ── Input Area ──────────────────────────────────────────── -->
+    <div class="input-area">
+        <div class="input-wrapper">
+
+            <!-- Reply-to bar (hidden by default) -->
+            <div id="reply-to-bar" class="reply-to-bar" role="status">
+                <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="9 17 4 12 9 7"/><path d="M20 18v-2a4 4 0 0 0-4-4H4"/></svg>
+                <span class="reply-to-label">Replying to</span>
+                <span id="reply-to-preview" class="reply-to-preview"></span>
+                <button id="reply-to-close" class="reply-to-close" aria-label="Cancel reply">×</button>
+            </div>
+
+            <!-- Attachment area (preview + prompt chips) -->
+            <div id="attachment-area" class="attachment-area">
+                <div class="attachment-preview">
+                    <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                        <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
+                        <polyline points="13 2 13 9 20 9"/>
+                    </svg>
+                    <div class="file-info">
+                        <span id="file-name-text" class="file-name-text"></span>
+                        <span id="file-size-text" class="file-size-text"></span>
+                    </div>
+                    <button id="remove-file" aria-label="Remove attachment">×</button>
+                </div>
+                <!-- Smart prompt chips for the attached file -->
+                <div class="file-prompt-chips" id="file-prompt-chips">
+                    <button class="file-prompt-chip" data-prompt="Summarize this file">📝 Summarize</button>
+                    <button class="file-prompt-chip" data-prompt="Explain the key concepts in this file">💡 Explain</button>
+                    <button class="file-prompt-chip" data-prompt="Extract the most important points from this file">🔑 Key Points</button>
+                    <button class="file-prompt-chip" data-prompt="Create a quiz from this file">📋 Quiz Me</button>
+                    <button class="file-prompt-chip" data-prompt="Translate this file content to Arabic">🌍 Translate</button>
+                    <button class="file-prompt-chip" data-prompt="What topics are covered in this file?">📚 Topics</button>
+                </div>
+            </div>
+
+            <!-- Suggestion chips (shown when no file attached) -->
+            <div id="suggestions-container" class="suggestions-container">
+                <div class="suggestion-chip" onclick="useSuggestion('Tell me about the BAIT program')">🎓 BAIT Program</div>
+                <div class="suggestion-chip" onclick="useSuggestion('How do I register for courses?')">📝 Registration</div>
+                <div class="suggestion-chip" onclick="useSuggestion('Show me a Flutter code example')">💻 Flutter Help</div>
+                <div class="suggestion-chip" onclick="useSuggestion('What scholarships are available at SVU?')">🏅 Scholarships</div>
+                <div class="suggestion-chip" onclick="useSuggestion('What are the graduation requirements?')">🎯 Graduation</div>
+            </div>
+
+            <!-- Main form row -->
+            <form id="chat-form" autocomplete="off">
+                <div class="input-container">
+                    <input type="file" id="file-input" style="display:none"
+                           accept=".pdf,.doc,.docx,.txt,.pptx,.xlsx,.csv,.md,.py,.js">
+                    <button type="button" id="attach-btn" class="attach-btn"
+                            data-tip="Attach file" aria-label="Attach file">
+                        <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                             stroke="currentColor" stroke-width="2">
+                            <path d="M21.44 11.05l-9.19 9.19a6 6 0 0 1-8.49-8.49l9.19-9.19a4 4 0 0 1 5.66 5.66l-9.2 9.19a2 2 0 0 1-2.83-2.83l8.49-8.48"/>
+                        </svg>
+                    </button>
+                    <input type="text" id="user-input"
+                           placeholder="Ask anything about SVU…" aria-label="Type your message">
+                </div>
+                <button type="submit" id="send-btn" aria-label="Send message">
+                    <svg width="20" height="20" viewBox="0 0 24 24" fill="none"
+                         stroke="currentColor" stroke-width="2"
+                         stroke-linecap="round" stroke-linejoin="round">
+                        <line x1="22" y1="2" x2="11" y2="13"/>
+                        <polygon points="22 2 15 22 11 13 2 9 22 2"/>
+                    </svg>
+                </button>
+            </form>
+
+        </div>
     </div>
 
-    <script>
-        const chatWindow = document.getElementById('chat-window');
-        const chatForm = document.getElementById('chat-form');
-        const userInput = document.getElementById('user-input');
-        const fileInput = document.getElementById('file-input');
-        const attachBtn = document.getElementById('attach-btn');
-        const attachmentPreview = document.getElementById('attachment-preview');
-        const fileNameSpan = document.getElementById('file-name');
-        const removeFileBtn = document.getElementById('remove-file');
-        const themeToggle = document.getElementById('theme-toggle');
-        const body = document.body;
-        const themeIcon = document.getElementById('theme-icon');
-        const themeText = document.getElementById('theme-text');
+    <!-- ── Footer ──────────────────────────────────────────────── -->
+    <footer>Built with ❤️ using <a href="#" tabindex="-1">Phoenix AI Framework</a> · South Valley University © 2025</footer>
 
-        let selectedFile = null;
+</div><!-- /.app-container -->
 
-        function useSuggestion(text) {
-            userInput.value = text;
-            chatForm.dispatchEvent(new Event('submit'));
-        }
+<script>
+// ═══════════════════════════════════════════════════════════════
+//  SVU Bot – UI Logic v2.0
+// ═══════════════════════════════════════════════════════════════
 
-        // Theme Toggle Logic
-        themeToggle.addEventListener('click', () => {
-            const currentTheme = body.getAttribute('data-theme');
-            const newTheme = currentTheme === 'dark' ? 'light' : 'dark';
-            body.setAttribute('data-theme', newTheme);
-            themeIcon.textContent = newTheme === 'dark' ? '☀️' : '🌙';
-            themeText.textContent = newTheme === 'dark' ? 'Light Mode' : 'Dark Mode';
-        });
+marked.setOptions({ breaks: true, gfm: true });
 
-        // File Attachment Logic
-        attachBtn.addEventListener('click', () => fileInput.click());
+// ── DOM refs ─────────────────────────────────────────────────
+const chatWindow       = document.getElementById('chat-window');
+const chatForm         = document.getElementById('chat-form');
+const userInput        = document.getElementById('user-input');
+const fileInput        = document.getElementById('file-input');
+const attachBtn        = document.getElementById('attach-btn');
+const attachmentArea   = document.getElementById('attachment-area');
+const fileNameText     = document.getElementById('file-name-text');
+const fileSizeText     = document.getElementById('file-size-text');
+const removeFileBtn    = document.getElementById('remove-file');
+const themeToggle      = document.getElementById('theme-toggle');
+const themeIcon        = document.getElementById('theme-icon');
+const themeText        = document.getElementById('theme-text');
+const replyToBar       = document.getElementById('reply-to-bar');
+const replyToPreview   = document.getElementById('reply-to-preview');
+const replyToClose     = document.getElementById('reply-to-close');
+const suggestionsContainer = document.getElementById('suggestions-container');
+const filePromptChips  = document.querySelectorAll('.file-prompt-chip');
 
-        fileInput.addEventListener('change', (e) => {
-            selectedFile = e.target.files[0];
-            if (selectedFile) {
-                fileNameSpan.textContent = selectedFile.name;
-                attachmentPreview.style.display = 'flex';
-            }
-        });
+// ── State ────────────────────────────────────────────────────
+let selectedFile  = null;
+let replyContext  = null;   // { sender, text }
+let msgCounter    = 0;
 
-        removeFileBtn.addEventListener('click', () => {
-            selectedFile = null;
-            fileInput.value = '';
-            attachmentPreview.style.display = 'none';
-        });
+// ── Helpers ──────────────────────────────────────────────────
+function formatFileSize(bytes) {
+    if (bytes < 1024) return `${bytes} B`;
+    if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+    return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+}
 
-        function addMessage(content, role) {
-            const div = document.createElement('div');
-            div.className = `message ${role}-message`;
-            
-            const contentDiv = document.createElement('div');
-            contentDiv.className = 'message-content';
-            contentDiv.innerHTML = role === 'bot' ? marked.parse(content) : content;
-            
-            div.appendChild(contentDiv);
-            chatWindow.appendChild(div);
-            chatWindow.scrollTop = chatWindow.scrollHeight;
-        }
+function getTime() {
+    return new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+}
 
-        function addTypingIndicator() {
-            const div = document.createElement('div');
-            div.className = 'message bot-message';
-            div.id = 'typing-indicator';
-            div.innerHTML = `
-                <div class="typing-indicator">
-                    <span></span><span></span><span></span>
-                </div>
-            `;
-            chatWindow.appendChild(div);
-            chatWindow.scrollTop = chatWindow.scrollHeight;
-        }
+function truncate(str, n = 80) {
+    return str.length > n ? str.slice(0, n) + '…' : str;
+}
 
-        chatForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const msg = userInput.value.trim();
-            if (!msg && !selectedFile) return;
+// ── Theme ────────────────────────────────────────────────────
+themeToggle.addEventListener('click', () => {
+    const isDark = document.body.getAttribute('data-theme') === 'dark';
+    const next = isDark ? 'light' : 'dark';
+    document.body.setAttribute('data-theme', next);
+    themeIcon.textContent = isDark ? '🌙' : '☀️';
+    themeText.textContent = isDark ? 'Dark' : 'Light';
+});
 
-            if (msg) addMessage(msg, 'user');
-            else if (selectedFile) addMessage(`Uploaded file: ${selectedFile.name}`, 'user');
+// ── File Attachment ───────────────────────────────────────────
+attachBtn.addEventListener('click', () => fileInput.click());
 
-            const formData = new FormData();
-            formData.append('message', msg || (selectedFile ? `Analyzing file: ${selectedFile.name}` : 'Hello'));
-            formData.append('session_id', 'web_session');
-            if (selectedFile) {
-                formData.append('file', selectedFile);
-            }
+fileInput.addEventListener('change', e => {
+    const f = e.target.files[0];
+    if (!f) return;
+    selectedFile = f;
+    fileNameText.textContent = f.name;
+    fileSizeText.textContent = formatFileSize(f.size);
+    attachmentArea.classList.add('visible');
+    suggestionsContainer.style.display = 'none';
+    userInput.focus();
+});
 
-            userInput.value = '';
-            selectedFile = null;
-            fileInput.value = '';
-            attachmentPreview.style.display = 'none';
+removeFileBtn.addEventListener('click', clearFile);
 
-            addTypingIndicator();
+function clearFile() {
+    selectedFile = null;
+    fileInput.value = '';
+    attachmentArea.classList.remove('visible');
+    suggestionsContainer.style.display = 'flex';
+}
 
-            try {
-                const response = await fetch('/chat', {
-                    method: 'POST',
-                    body: formData
-                });
-                const data = await response.json();
-                document.getElementById('typing-indicator')?.remove();
-                addMessage(data.reply, 'bot');
-            } catch (err) {
-                document.getElementById('typing-indicator')?.remove();
-                addMessage('Sorry, I encountered an error. Please try again.', 'bot');
-            }
-        });
-    </script>
+// File prompt chip clicks
+filePromptChips.forEach(chip => {
+    chip.addEventListener('click', () => {
+        userInput.value = chip.dataset.prompt;
+        userInput.focus();
+    });
+});
+
+// ── Suggestion chips ─────────────────────────────────────────
+function useSuggestion(text) {
+    userInput.value = text;
+    chatForm.dispatchEvent(new Event('submit'));
+}
+
+// ── Reply-to ─────────────────────────────────────────────────
+function setReply(sender, text) {
+    replyContext = { sender, text };
+    replyToPreview.textContent = `${sender}: ${truncate(text, 70)}`;
+    replyToBar.classList.add('visible');
+    userInput.focus();
+}
+
+function clearReply() {
+    replyContext = null;
+    replyToBar.classList.remove('visible');
+    replyToPreview.textContent = '';
+}
+
+replyToClose.addEventListener('click', clearReply);
+
+// ── Keyboard shortcut: Escape cancels reply ───────────────────
+document.addEventListener('keydown', e => {
+    if (e.key === 'Escape' && replyContext) clearReply();
+});
+
+// ── Message renderer ─────────────────────────────────────────
+function addMessage({ content, role, fileName = null, replyTo = null }) {
+    msgCounter++;
+    const id = `msg-${msgCounter}`;
+    const isBot = role === 'bot';
+    const senderName = isBot ? 'SVU Bot' : 'You';
+    const avatarLabel = isBot ? '🤖' : 'U';
+
+    // Group wrapper
+    const group = document.createElement('div');
+    group.className = `message-group ${isBot ? 'bot-group' : 'user-group'}`;
+    group.id = id;
+
+    // Meta row (avatar + name + time)
+    const meta = document.createElement('div');
+    meta.className = 'message-meta';
+    meta.innerHTML = `
+        <div class="avatar ${isBot ? 'bot-avatar' : 'user-avatar'}">${avatarLabel}</div>
+        <span class="sender-name">${senderName}</span>
+        <span class="msg-time">${getTime()}</span>
+    `;
+    group.appendChild(meta);
+
+    // Bubble wrapper (bubble + action buttons)
+    const bubbleWrapper = document.createElement('div');
+    bubbleWrapper.className = 'bubble-wrapper';
+
+    // Content bubble
+    const bubble = document.createElement('div');
+    bubble.className = 'message-content';
+
+    // Optional reply-quote strip inside bubble
+    if (replyTo) {
+        const quote = document.createElement('div');
+        quote.className = 'reply-quote';
+        quote.innerHTML = `
+            <span class="reply-quote-label">${replyTo.sender}</span>
+            <span class="reply-quote-text">${truncate(replyTo.text, 60)}</span>
+        `;
+        bubble.appendChild(quote);
+    }
+
+    // Optional file badge
+    if (fileName) {
+        const badge = document.createElement('div');
+        badge.className = 'file-badge-msg';
+        badge.innerHTML = `
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                <path d="M13 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V9z"/>
+                <polyline points="13 2 13 9 20 9"/>
+            </svg>
+            ${fileName}
+        `;
+        bubble.appendChild(badge);
+    }
+
+    // Text content
+    const textNode = document.createElement('div');
+    textNode.innerHTML = isBot ? marked.parse(content) : escapeHtml(content);
+    bubble.appendChild(textNode);
+
+    // Action buttons (reply, copy)
+    const actions = document.createElement('div');
+    actions.className = 'bubble-actions';
+    actions.innerHTML = `
+        <button class="bubble-action-btn" data-tip="Reply" aria-label="Reply to this message"
+                onclick="replyToMessage('${id}', '${escapeAttr(senderName)}', '${escapeAttr(content)}')">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <polyline points="9 17 4 12 9 7"/>
+                <path d="M20 18v-2a4 4 0 0 0-4-4H4"/>
+            </svg>
+        </button>
+        <button class="bubble-action-btn" data-tip="Copy" aria-label="Copy message"
+                onclick="copyMessage('${id}', this)">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5">
+                <rect x="9" y="9" width="13" height="13" rx="2" ry="2"/>
+                <path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/>
+            </svg>
+        </button>
+    `;
+
+    if (isBot) {
+        bubbleWrapper.appendChild(bubble);
+        bubbleWrapper.appendChild(actions);
+    } else {
+        bubbleWrapper.appendChild(actions);
+        bubbleWrapper.appendChild(bubble);
+    }
+
+    group.appendChild(bubbleWrapper);
+    chatWindow.appendChild(group);
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+    return id;
+}
+
+// ── Escape helpers ────────────────────────────────────────────
+function escapeHtml(str) {
+    return str.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+function escapeAttr(str) {
+    return str.replace(/\\/g,'\\\\').replace(/'/g,"\\'").replace(/"/g,'&quot;').replace(/\n/g,' ');
+}
+
+// ── Reply action (called from inline onclick) ─────────────────
+function replyToMessage(msgId, sender, text) {
+    setReply(sender, text);
+}
+
+// ── Copy action ───────────────────────────────────────────────
+function copyMessage(msgId, btn) {
+    const group = document.getElementById(msgId);
+    const bubble = group.querySelector('.message-content');
+    const text = bubble.innerText.trim();
+    navigator.clipboard.writeText(text).then(() => {
+        btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><polyline points="20 6 9 17 4 12"/></svg>`;
+        setTimeout(() => {
+            btn.innerHTML = `<svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>`;
+        }, 2000);
+    });
+}
+
+// ── Typing indicator ─────────────────────────────────────────
+function showTyping() {
+    const group = document.createElement('div');
+    group.className = 'message-group bot-group';
+    group.id = 'typing-indicator';
+
+    const meta = document.createElement('div');
+    meta.className = 'message-meta';
+    meta.innerHTML = `<div class="avatar bot-avatar">🤖</div><span class="sender-name">SVU Bot</span>`;
+    group.appendChild(meta);
+
+    const wrapper = document.createElement('div');
+    wrapper.className = 'bubble-wrapper';
+    wrapper.innerHTML = `
+        <div class="typing-indicator">
+            <span></span><span></span><span></span>
+        </div>`;
+    group.appendChild(wrapper);
+    chatWindow.appendChild(group);
+    chatWindow.scrollTop = chatWindow.scrollHeight;
+}
+
+function hideTyping() {
+    document.getElementById('typing-indicator')?.remove();
+}
+
+// ── Submit ────────────────────────────────────────────────────
+chatForm.addEventListener('submit', async e => {
+    e.preventDefault();
+
+    const msg = userInput.value.trim();
+    if (!msg && !selectedFile) return;
+
+    const currentReply = replyContext;
+    const currentFile  = selectedFile;
+    const displayMsg   = msg || `Attached file: ${currentFile?.name}`;
+
+    // Show user message
+    addMessage({
+        content : displayMsg,
+        role    : 'user',
+        fileName: currentFile ? currentFile.name : null,
+        replyTo : currentReply,
+    });
+
+    // Build form data
+    const formData = new FormData();
+    formData.append('session_id', 'web_session');
+
+    let apiMsg = msg;
+    if (currentReply) {
+        apiMsg = `[Replying to ${currentReply.sender}: "${truncate(currentReply.text, 50)}"] ${msg}`;
+    }
+    formData.append('message', apiMsg || `Analyzing file: ${currentFile?.name}`);
+    if (currentFile) formData.append('file', currentFile);
+
+    // Reset state
+    userInput.value = '';
+    clearFile();
+    clearReply();
+
+    showTyping();
+
+    try {
+        const res  = await fetch('/chat', { method: 'POST', body: formData });
+        const data = await res.json();
+        hideTyping();
+        addMessage({ content: data.reply, role: 'bot' });
+    } catch (err) {
+        hideTyping();
+        addMessage({ content: 'Sorry, I encountered an error. Please try again.', role: 'bot' });
+    }
+});
+
+// ── Welcome message ───────────────────────────────────────────
+addMessage({
+    content: `Welcome to the **South Valley University** Virtual Assistant! 🏛️
+
+I can help you with:
+- 📚 **Course information** and academic programs
+- 🏫 **Campus details** and services
+- 📄 **Document analysis** — just attach a file!
+- 💻 **Code examples** and technical questions
+
+How can I assist you today?`,
+    role: 'bot',
+});
+</script>
 </body>
 </html>
-
-
