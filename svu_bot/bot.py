@@ -1,5 +1,6 @@
 import asyncio
 import os
+import re
 from phoenix.framework.chatbot import ChatBot
 
 # Import modular NLP steps (Each handled by a different team member)
@@ -64,7 +65,32 @@ class SVUBot:
         # Step 5: Team Auditing (Member 5)
         InteractionAuditor.process(session_id, cleaned_prompt, final_response, intent)
         
+        # If user requested Arabic, translate the final response into Arabic.
+        if SVUBot._wants_arabic(cleaned_prompt):
+            translate_instruction = (
+                "Translate the following text into Arabic. Keep the meaning and tone, "
+                "do not add extra commentary or links. Only provide the Arabic translation.\n\n"
+                f"{final_response}"
+            )
+
+            # Ask the LLM to translate (explicit instruction to avoid using RAG context)
+            translated = await self.bot_instance.chat(text=translate_instruction)
+
+            # Sanitize any leaked lines in the translation output; fall back to raw translation
+            sanitized = OutputAdapter.sanitize(translated)
+            if sanitized:
+                final_response = sanitized
+            else:
+                final_response = translated
+
         return final_response
+
+    @staticmethod
+    def _wants_arabic(prompt_text: str) -> bool:
+        if not prompt_text:
+            return False
+        pattern = re.compile(r"\b(in arabic|translate to arabic|translate into arabic|باللغة العربية|اشرح بالعربية|شرح بالعربية|بالعربي|ترجم إلى العربية)\b", re.IGNORECASE)
+        return bool(pattern.search(prompt_text))
 
 if __name__ == "__main__":
     bot = SVUBot()
