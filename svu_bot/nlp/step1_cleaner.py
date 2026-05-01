@@ -35,7 +35,8 @@ class TextCleaner:
         # 4. Normalize punctuation (remove duplicate symbols)
         text = re.sub(r'([!?.])\1+', r'\1', text)
         
-        # 5. Remove special characters (keep letters, numbers, and basic punctuation)
-        text = re.sub(r'[^a-zA-Z0-9\s!?.@#$%-]', '', text)
+        # 5. Keep letters (incl. Arabic & Unicode), numbers, and useful punctuation.
+        #    Only strip genuinely dangerous/useless control characters.
+        text = re.sub(r'[^\w\s!?.@#$%\-:,()\'"_/\u0600-\u06FF\u0750-\u077F]', '', text)
         
         return text

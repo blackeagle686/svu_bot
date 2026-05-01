@@ -43,11 +43,13 @@ async def chat_endpoint(
         file_path = os.path.join(DATA_DIR, file.filename)
         with open(file_path, "wb") as buffer:
             shutil.copyfileobj(file.file, buffer)
-        
+
         if not message or message.strip() == "":
-            message = f"I've uploaded {file.filename}. Please analyze it."
+            # No custom prompt – use generic analysis request
+            message = f"I've uploaded '{file.filename}'. Please analyze it and provide a comprehensive summary."
         else:
-            message = f"{message} (Context: I've also uploaded {file.filename})"
+            # User chose a smart prompt chip (e.g. "Summarize this file") – keep intent, add file context
+            message = f"{message} The file I'm referring to is: '{file.filename}' (just uploaded)."
 
     # Fallback for message if somehow still None
     if not message:
