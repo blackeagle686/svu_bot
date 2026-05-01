@@ -39,6 +39,20 @@ _LEAK_PATTERNS = [
 
 _LEAK_RE = re.compile('|'.join(_LEAK_PATTERNS), re.MULTILINE | re.IGNORECASE)
 
+# Common LLM fallback/apology patterns that should be treated as 'no useful content'
+_APOLOGY_PATTERNS = [
+    r"couldn\'t find information",
+    r"could not find information",
+    r"I\'m sorry, but I couldn\'t find",
+    r"I do not have information",
+    r"I don\'t have information",
+    r"I cannot find information",
+    r"couldn\'t find a direct match",
+    r"couldn\'t find any information",
+    r"no information available",
+]
+_APOLOGY_RE = re.compile('|'.join(_APOLOGY_PATTERNS), re.IGNORECASE)
+
 
 class OutputAdapter:
     """Handled by Member 4 of the NLP team."""
@@ -53,6 +67,11 @@ class OutputAdapter:
         lines = raw.splitlines()
         clean_lines = [ln for ln in lines if not _LEAK_RE.match(ln.strip())]
         result = '\n'.join(clean_lines).strip()
+
+        # If the cleaned result only contains an apology / fallback phrase from the LLM,
+        # treat it as empty so the orchestrator can fallback to a general-knowledge call.
+        if _APOLOGY_RE.search(result):
+            return None
 
         # Edge-case: entire response was noise → signal to caller (None)
         if not result:
