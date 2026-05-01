@@ -59,7 +59,7 @@ class SVUBot:
         raw_response = await self.bot_instance.chat(text=cleaned_prompt)
         
         # Step 4: Output Adaptation (Member 4)
-        final_response = OutputAdapter.process(raw_response)
+        final_response = OutputAdapter.process(raw_response, cleaned_prompt)
         
         # Step 5: Team Auditing (Member 5)
         InteractionAuditor.process(session_id, cleaned_prompt, final_response, intent)
