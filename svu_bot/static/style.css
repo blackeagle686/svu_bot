@@ -1,3 +1,44 @@
+[/* VSCode-like token colors for highlight.js */]
+.hljs {
+    display: block;
+    overflow-x: auto;
+    padding: 12px 14px;
+    background: #0a0b0c; /* fallback dark */
+}
+
+/* Dark theme tokens (approximate VS Code Dark+ palette) */
+.hljs-comment,
+.hljs-quote { color: #6A9955; }
+.hljs-keyword,
+.hljs-selector-tag,
+.hljs-subst { color: #569CD6; }
+.hljs-number,
+.hljs-literal,
+.hljs-variable,
+.hljs-template-variable,
+.hljs-tag .hljs-attr { color: #B5CEA8; }
+.hljs-string,
+.hljs-doctag { color: #CE9178; }
+.hljs-title,
+.hljs-section,
+.hljs-built_in,
+.hljs-builtin-name,
+.hljs-type { color: #4EC9B0; }
+.hljs-name,
+.hljs-params { color: #DCDCAA; }
+.hljs-attr,
+.hljs-property { color: #9CDCFE; }
+.hljs-symbol,
+.hljs-bullet { color: #D4D4D4; }
+
+/* Light theme adjustments: ensure tokens readable on light backgrounds */
+[data-theme="light"] .hljs { background: #f6f8fb; color: #0b1220; }
+[data-theme="light"] .hljs-comment,
+[data-theme="light"] .hljs-quote { color: #6a9955; }
+[data-theme="light"] .hljs-keyword { color: #0000ff; }
+[data-theme="light"] .hljs-string { color: #a31515; }
+[data-theme="light"] .hljs-title { color: #795e26; }
+
 /* ============================================================
    SVU BOT – Premium UI v2.0
    Modern Glassmorphism + Dark/Light Theme
@@ -75,7 +116,7 @@ body {
     background: var(--bg-primary);
     color: var(--text-primary);
     height: 100vh;
-    overflow: hidden;
+    overflow: auto; /* allow page scrolling */
     display: flex;
     flex-direction: column;
 }
@@ -241,7 +282,8 @@ header::before {
     box-shadow: var(--shadow-md);
     scroll-behavior: smooth;
     /* Ensure chat area is taller so messages and code blocks have more room */
-    min-height: calc(100vh - var(--header-height) - 180px);
+    /* make chat window taller */
+    min-height: calc(100vh - var(--header-height) - 80px);
 }
 
 #chat-window::-webkit-scrollbar { width: 5px; }

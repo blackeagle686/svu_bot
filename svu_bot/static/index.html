@@ -9,6 +9,9 @@
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="/static/style.css">
     <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+    <!-- Syntax highlighting (highlight.js) -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/styles/atom-one-dark.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.7.0/highlight.min.js"></script>
 </head>
 <body data-theme="dark">
 
@@ -328,6 +331,19 @@ function addMessage({ content, role, fileName = null, replyTo = null }) {
     group.appendChild(bubbleWrapper);
     chatWindow.appendChild(group);
     chatWindow.scrollTop = chatWindow.scrollHeight;
+    // Highlight any code blocks inside the newly added message
+    try {
+        const codes = group.querySelectorAll('pre code');
+        codes.forEach((block) => {
+            // ensure hljs class present
+            block.classList.add('hljs');
+            if (window.hljs) {
+                window.hljs.highlightElement(block);
+            }
+        });
+    } catch (e) {
+        console.warn('Highlighting error', e);
+    }
     return id;
 }
 
