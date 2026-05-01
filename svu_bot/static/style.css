@@ -227,7 +227,7 @@ header::before {
 
 /* ─── Chat Window ────────────────────────────────────────────── */
 #chat-window {
-    flex: 1;
+    flex: 1 1 auto;
     background: var(--glass-bg);
     backdrop-filter: var(--glass-blur);
     -webkit-backdrop-filter: var(--glass-blur);
@@ -240,6 +240,8 @@ header::before {
     border: 1px solid var(--border);
     box-shadow: var(--shadow-md);
     scroll-behavior: smooth;
+    /* Ensure chat area is taller so messages and code blocks have more room */
+    min-height: calc(100vh - var(--header-height) - 180px);
 }
 
 #chat-window::-webkit-scrollbar { width: 5px; }
@@ -460,7 +462,17 @@ header::before {
 }
 
 [data-theme="light"] .message-content pre {
-    background: #1a1d2e;
+    /* Light-theme code blocks: lighter background and darker text for readability */
+    background: #f6f8fb;
+    color: #0b1220;
+    border: 1px solid rgba(11,18,32,0.06);
+}
+
+[data-theme="light"] .message-content code {
+    background: rgba(11,18,32,0.04);
+    color: #0b1220;
+    padding: 2px 6px;
+    border-radius: 6px;
 }
 
 .message-content code {
@@ -622,7 +634,7 @@ header::before {
 
 .attachment-preview svg { color: var(--accent); flex-shrink: 0; }
 .attachment-preview .file-info { display: flex; flex-direction: column; }
-.file-name-text { font-weight: 600; font-size: 0.8rem; }
+.file-name-text { font-weight: 600; font-size: 0.8rem; color: var(--text-primary); }
 .file-size-text { font-size: 0.68rem; color: var(--text-muted); }
 
 #remove-file {
