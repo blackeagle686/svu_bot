@@ -58,9 +58,27 @@ class SVUBot:
         # Framework Generation
         self.bot_instance.set_session(session_id)
         raw_response = await self.bot_instance.chat(text=cleaned_prompt)
-        
+
         # Step 4: Output Adaptation (Member 4)
-        final_response = OutputAdapter.process(raw_response, cleaned_prompt)
+        # First sanitize to detect whether the RAG-enhanced response contained usable content
+        sanitized = OutputAdapter.sanitize(raw_response)
+
+        if sanitized is None:
+            # No usable RAG result — re-query the model with an explicit general-knowledge instruction
+            general_prompt = (
+                "Please answer the following question thoroughly using your general knowledge. "
+                "Do not say you couldn't find information or reference the university documents. "
+                "Provide a full, helpful response appropriate for a student.\n\n"
+                f"Question: {cleaned_prompt}"
+            )
+
+            # Make a fresh LLM call focused on general knowledge (this avoids relying on RAG results)
+            fallback_raw = await self.bot_instance.chat(text=general_prompt)
+
+            # Sanitize and adapt the fallback answer before returning
+            final_response = OutputAdapter.process(fallback_raw, cleaned_prompt)
+        else:
+            final_response = OutputAdapter.process(raw_response, cleaned_prompt)
         
         # Step 5: Team Auditing (Member 5)
         InteractionAuditor.process(session_id, cleaned_prompt, final_response, intent)
